@@ -3,10 +3,22 @@
   "version": "0.1.0",
   "description": "Javascript Algorithm Implementation",
   "private": true,
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Wayne Fuchs",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.23.6",
+    "@babel/preset-env": "^7.23.6",
+    "@babel/preset-typescript": "^7.23.3",
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.11",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "prettier": "3.1.1",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  }
 }
