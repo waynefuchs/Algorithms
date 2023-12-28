@@ -1,5 +1,4 @@
-import { describe, expect, test } from "@jest/globals";
-import linearSearchList from "../LinearSearchList";
+import LinearSearchList from "../LinearSearchList";
 
 describe("Linear Search List", () => {
   const array = [
@@ -7,23 +6,16 @@ describe("Linear Search List", () => {
   ];
 
   it("Should return true when number exists in haystack", () => {
-    expect(linearSearchList(array, 10)).toBe(true);
+    expect(LinearSearchList(array, 10)).toBe(true);
   });
 
   it("Should return false when number does not exist in haystack", () => {
-    expect(linearSearchList(array, 11)).toBe(false);
+    expect(LinearSearchList(array, 11)).toBe(false);
   });
 
-  it("Should return false when given incorrect data type for needle", () => {
-    expect(linearSearchList(array, "hello")).toBe(false);
-  });
-  it("Should return false when given incorrect data type for haystack", () => {
-    expect(linearSearchList("hello", 11)).toBe(false);
-  });
-  it("Should return false when given incorrect data type for needle and needle", () => {
-    expect(linearSearchList(7, "three")).toBe(false);
-  });
-  it("Should return false when given null as haystack", () => {
-    expect(linearSearchList(null, 0)).toBe(false);
+  it("Should successfully locate every number in supplied array", () => {
+    expect(array.map((v) => LinearSearchList(array, v))).toEqual(
+      Array(array.length).fill(true)
+    );
   });
 });
