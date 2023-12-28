@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import linearSearchList from "./LinearSearchList.ts";
+import linearSearchList from "../LinearSearchList";
 
 describe("Linear Search List", () => {
   const array = [
