@@ -33,6 +33,17 @@ export default class DataAnalysis {
   }
 
   /**
+   * Create a list of randomly generated numbers
+   * @param max The maximum value in range 0..max
+   * @param offset Offset to add to the max value
+   * @param n Number of generated numbers
+   * @returns A list of n randomly generated numbers
+   */
+  static getRandomList(max: number, offset: number, n: number): number[] {
+    return [...Array(n)].map(() => this.getRandomInt(max, offset));
+  }
+
+  /**
    * Determine if a numerical list is sorted in ascending order
    * O(n)
    * @param list A list of numbers
