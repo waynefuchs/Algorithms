@@ -26,7 +26,7 @@ export default class DataAnalysis {
     n: number
   ): number[] {
     let tally = start;
-    return Array(n).map(() => {
+    return [...Array(n)].map(() => {
       tally += this.getRandomInt(stepVariation, stepOffset);
       return tally;
     });
@@ -39,6 +39,8 @@ export default class DataAnalysis {
    * @returns A boolean indicating whether the list is sorted or not
    */
   static isListOrderedAscending(list: number[]): boolean {
-    return list.every((v, i, a) => (i === 0 ? true : v > a[i - 1]));
+    return list.every((v, i, a) => {
+      return i === 0 ? true : v > a[i - 1] && v !== undefined;
+    });
   }
 }

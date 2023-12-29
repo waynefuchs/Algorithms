@@ -1,4 +1,5 @@
 import BinarySearchList from "../BinarySearchList";
+import DataAnalysis from "../DataAnalysis";
 
 describe("Binary Search List", () => {
   const array = [
@@ -20,5 +21,17 @@ describe("Binary Search List", () => {
     expect([...array].map((v) => BinarySearchList(array, v))).toEqual(
       Array(array.length).fill(true)
     );
+  });
+  it("Handles very large data sets", () => {
+    const count = 1_000_000;
+    const data = DataAnalysis.getRandomLinearOrderedList(
+      -100_000,
+      500,
+      1,
+      count
+    );
+    const index = Math.floor(count * 0.77);
+    expect(BinarySearchList(data, data[index])).toBe(true);
+    expect(BinarySearchList(data, -100_001)).toBe(false);
   });
 });
