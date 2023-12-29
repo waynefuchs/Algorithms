@@ -23,17 +23,17 @@ export default function BinarySearchList(
   for (
     let indexMin = 0,
       indexMax = haystack.length - 1,
-      indexHalf = getHalfIndex(indexMin, indexMax);
+      indexMidpoint = getHalfIndex(indexMin, indexMax);
     indexMin <= indexMax;
-    indexHalf = getHalfIndex(indexMin, indexMax), iterations++
+    indexMidpoint = getHalfIndex(indexMin, indexMax), iterations++
   ) {
-    const currentValue = haystack[indexHalf];
-    if (currentValue === needle) return true; // Found it
-    else if (needle < currentValue && indexMax !== indexHalf)
-      indexMax = indexHalf; // Move Left
-    else if (currentValue < needle && indexMin !== indexHalf)
-      indexMin = indexHalf; // Move Right
-    else indexMin++; // "stuck", move right
+    const valueMidpoint = haystack[indexMidpoint];
+    if (valueMidpoint === needle) return true; // Found it
+    else if (needle < valueMidpoint && indexMax !== indexMidpoint)
+      indexMax = indexMidpoint; // Move Left
+    else if (valueMidpoint < needle && indexMin !== indexMidpoint)
+      indexMin = indexMidpoint; // Move Right
+    else indexMin++; // "stuck", collapse window by increasing indexMin
   }
   return false;
 }
