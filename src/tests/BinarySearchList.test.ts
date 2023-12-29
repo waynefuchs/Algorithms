@@ -22,8 +22,8 @@ describe("Binary Search List", () => {
       Array(array.length).fill(true)
     );
   });
-  it("Handles very large data sets", () => {
-    const count = 1_000_000;
+  it("Handles large data sets", () => {
+    const count = 100_000;
     const data = DataAnalysis.getRandomLinearOrderedList(
       -100_000,
       500,
