@@ -6,22 +6,19 @@ export default function BubbleSortList(
   list: number[],
   ascending: boolean = true
 ) {
-  for (let iterationCount = 0; iterationCount < list.length; iterationCount++) {
-    for (
-      let passCount = 0;
-      passCount < list.length - iterationCount - 1;
-      passCount++
-    ) {
-      // This will push the greater numbers to the end (ascending)
-      // and will push the smaller numbers to the end (descending)
+  for (let i = 0; i < list.length; i++) {
+    for (let j = 0; j < list.length - i - 1; j++) {
       if (
-        (ascending && list[passCount] > list[passCount + 1]) ||
-        (!ascending && list[passCount] < list[passCount + 1])
+        // This will push the greater numbers to the end (ascending)
+        (ascending && list[j] > list[j + 1]) ||
+        // and will push the smaller numbers to the end (descending)
+        (!ascending && list[j] < list[j + 1])
       ) {
-        const neighbor = list[passCount + 1];
-        list[passCount + 1] = list[passCount];
-        list[passCount] = neighbor;
+        const neighbor = list[j + 1];
+        list[j + 1] = list[j];
+        list[j] = neighbor;
       }
     }
   }
+  return list;
 }
