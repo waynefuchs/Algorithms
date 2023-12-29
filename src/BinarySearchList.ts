@@ -19,12 +19,13 @@ export default function BinarySearchList(
   const getHalfIndex = (min: number, max: number): number =>
     Math.floor((min + max) / 2);
 
+  let iterations = 0;
   for (
     let indexMin = 0,
       indexMax = haystack.length - 1,
       indexHalf = getHalfIndex(indexMin, indexMax);
     indexMin <= indexMax;
-    indexHalf = getHalfIndex(indexMin, indexMax)
+    indexHalf = getHalfIndex(indexMin, indexMax), iterations++
   ) {
     const currentValue = haystack[indexHalf];
     if (currentValue === needle) return true; // Found it
