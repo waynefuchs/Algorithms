@@ -4,6 +4,15 @@ type LinkedListNodeProp = {
   prev?: LinkedListNodeProp | null;
 };
 
+// - getSize
+// - get(index)
+// - append(item)
+
+// - prepend(item)
+// - insertAt(item, index)
+// - remove(item)
+// - removeAt(index)
+
 export default class LinkedList {
   #isDoublyLinked;
   #isCircular;
@@ -61,30 +70,53 @@ export default class LinkedList {
    * @returns The newly created node
    */
   append(data): LinkedListNodeProp {
-    // Create the node
     const newNode = this.#createNode(data);
-
-    if (this.#last === null || this.#size === 0 || this.#first === null) {
-      // New node is the first node
-      this.#first = this.#last = newNode;
-    } else {
-      // Let the last node to be the newly created node and set links
-      const staleLast = this.#last;
-      staleLast.next = newNode;
-      this.#last = newNode;
-    }
-
-    // Handle circular exception
-    if (this.#isCircular) {
-      this.#last.next = this.#first;
-      if (this.#isDoublyLinked) {
-        this.#first.prev = this.#last;
-      }
-    }
-
-    // Increment linked list size and return the newly created node
+    this.#insertAfter(this.#last, newNode);
     this.#size++;
     return newNode;
+  }
+
+  #insertAfter(
+    node: LinkedListNodeProp | null,
+    newNode: LinkedListNodeProp
+  ): undefined {
+    // Handle the insertion
+
+    // Guard against node being null
+    // There is one case in which null is valid, if there aren't any nodes yet in the linked list
+    if (node === null) {
+      if (this.#last === null && this.#first === null && this.#size === 0) {
+        this.#first = newNode;
+        this.#last = newNode;
+        // TODO: Handle circular
+        return;
+      }
+      throw new Error("Invalid state: can not insert a new node after 'null'");
+    }
+
+    // Handle special case if `node` is the last node in the list
+    if (node.next === null) {
+      if (node === this.#last) {
+        node.next = newNode;
+        this.#last = newNode;
+        if (this.#isDoublyLinked) {
+          newNode.prev = node;
+        }
+        // TODO: Handle circular
+        return;
+      }
+      throw new Error("Invalid state: Next node is null but node is not #last");
+    }
+
+    // Normal insertion
+    // [node] -> [newNode] -> [nextNode]
+    const nextNode = node.next;
+    node.next = newNode;
+    newNode.next = nextNode;
+    if (this.#isDoublyLinked) {
+      nextNode.prev = newNode;
+      newNode.prev = node;
+    }
   }
 
   /**
@@ -98,21 +130,4 @@ export default class LinkedList {
     for (let x = 1; x <= index; x++) node = node?.next || null;
     return node;
   }
-
-  // #isLastIndex(index: number) {
-  //   return index === this.getLength() - 1;
-  // }
-  // #getNode(index: number) {
-  //   const data = this.list[index];
-  //   const nextLink =
-  //     this.getLength() === 0
-  //       ? null
-  //       : this.#isLastIndex(index)
-  //         ? this.isCircular
-  //           ? this.getStart()
-  //           : null
-  //         : this.get(index + 1);
-  //   const node = { data };
-  //   return node;
-  // }
 }
