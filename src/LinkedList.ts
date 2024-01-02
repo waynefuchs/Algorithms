@@ -76,12 +76,15 @@ export default class LinkedList {
     return newNode;
   }
 
+  /**
+   * Insert a node into the linked list
+   * @param node Node to insert after
+   * @param newNode The node to be inserted
+   */
   #insertAfter(
     node: LinkedListNodeProp | null,
     newNode: LinkedListNodeProp
   ): undefined {
-    // Handle the insertion
-
     // Guard against node being null
     // There is one case in which null is valid, if there aren't any nodes yet in the linked list
     if (node === null) {
