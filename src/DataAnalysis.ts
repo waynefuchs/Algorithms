@@ -50,6 +50,7 @@ export default class DataAnalysis {
    * @returns A boolean indicating whether the list is sorted or not
    */
   static isListOrderedAscending(list: number[]): boolean {
+    if (!Array.isArray(list)) return false;
     return list.every((v, i, a) => {
       return i === 0 ? true : v > a[i - 1] && v !== undefined;
     });
