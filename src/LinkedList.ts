@@ -4,22 +4,11 @@ type LinkedListNode = {
   prev?: LinkedListNode | null;
 };
 
+// TODO: Implement Circular (maybe..someday)
 type LinkedListOptions = {
   // circular?: boolean;
   doublyLinked?: boolean;
 };
-
-// - getSize
-// - get(index)
-// - push(item)
-// - unshift(item)
-
-// - pop
-
-// - unshift
-// - insertAt(item, index)
-// - remove(item)
-// - removeAt(index)
 
 export default class LinkedList {
   #isDoublyLinked;
@@ -126,7 +115,7 @@ export default class LinkedList {
 
   shift(): LinkedListNode | null {
     // empty list
-    if (!this.#head || !this.#tail) return null;
+    if (!this.#head || !this.#tail || this.#length === 0) return null;
 
     // Keep a reference
     const deletedNode: LinkedListNode = this.#head;
@@ -140,9 +129,14 @@ export default class LinkedList {
 
     // more than one node
     this.#head = deletedNode.next;
-    if (!this.#head?.next)
+    deletedNode.next = null;
+    if (!this.#head) {
       throw new Error("Second node in linked list should not be null");
-    if (this.#isDoublyLinked) this.#head.prev = null;
+    }
+    if (this.#isDoublyLinked) {
+      this.#head.prev = null;
+      deletedNode.prev = null;
+    }
     this.#length--;
     return deletedNode;
   }
