@@ -231,7 +231,7 @@ describe("Linked List", () => {
     });
 
     it("Will remove from the middle", () => {
-      const ll = new LinkedList();
+      const ll = new LinkedList({ doublyLinked: true });
       ll.push("How");
       const middle1 = ll.push("now");
       const middle2 = ll.push("brown");

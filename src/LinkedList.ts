@@ -208,8 +208,10 @@ export default class LinkedList {
 
   remove(node: LinkedListNode): LinkedListNode | null {
     let nodeToRemove: LinkedListNode | null = this.#head;
+    let prevNode: LinkedListNode | null = null;
     do {
       if (nodeToRemove === node) break;
+      prevNode = nodeToRemove;
       nodeToRemove = nodeToRemove!.next;
     } while (node !== null);
 
@@ -230,8 +232,17 @@ export default class LinkedList {
     // Item is head
     if (nodeToRemove === this.#head) return this.shift();
 
-    console.log("Good news, Getting here", nodeToRemove.value);
-
+    // Item is in the middle
+    if (prevNode === null)
+      throw new Error("Previous item isn't head, but is also null");
+    prevNode.next = nodeToRemove.next;
+    if (this.#isDoublyLinked)
+      !!nodeToRemove.next &&
+        "prev" in nodeToRemove.next &&
+        (nodeToRemove.next.prev = prevNode);
+    nodeToRemove.next = null;
+    "prev" in nodeToRemove && (nodeToRemove.prev = null);
+    this.#length--;
     return nodeToRemove;
   }
 
