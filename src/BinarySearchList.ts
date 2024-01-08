@@ -7,6 +7,10 @@
  * @param needle - The number to search for within haystack
  * @returns - true or false depending on whether the needle was successfully located
  */
+// Function to calculate the midpoint index for halving
+export const getHalfIndex = (min: number, max: number): number =>
+  Math.floor((min + max) / 2);
+
 export default function BinarySearchList(
   haystack: number[],
   needle: number
@@ -14,10 +18,6 @@ export default function BinarySearchList(
   // Simple guard to protect against ignored typescript typing
   if (!Array.isArray(haystack)) return false;
   if (typeof needle !== "number") return false;
-
-  // Function to calculate the midpoint index for halving
-  const getHalfIndex = (min: number, max: number): number =>
-    Math.floor((min + max) / 2);
 
   let iterations = 0;
   for (

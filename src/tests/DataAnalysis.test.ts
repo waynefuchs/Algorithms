@@ -55,5 +55,12 @@ describe("Data Analysis", () => {
       const data = [1, 2, 3, 5, 4];
       expect(DataAnalysis.isListOrderedAscending(data)).toBe(false);
     });
+
+    it("Should return false instead of error on ts override", () => {
+      //@ts-ignore
+      expect(DataAnalysis.isListOrderedAscending([1, "hi", 3])).toBe(false);
+      //@ts-ignore
+      expect(DataAnalysis.isListOrderedAscending("hello")).toBe(false);
+    });
   });
 });
