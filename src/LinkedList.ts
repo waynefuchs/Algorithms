@@ -144,11 +144,11 @@ export default class LinkedList {
   insert(index: number, value: any): LinkedListNode | null {
     if (index < 0 || index > this.#length) return null;
 
-    // at end
-    if (index === this.length) return this.push(value);
-
     // at beginning
     if (index === 0) return this.unshift(value);
+
+    // at end
+    if (index === this.length) return this.push(value);
 
     // somewhere in the middle
     const newNode = this.#createNode(value);
