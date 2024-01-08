@@ -209,7 +209,8 @@ export default class LinkedList {
    */
   #getPreviousNode(node: LinkedListNode): LinkedListNode | null {
     // Doubly linked list will point back
-    if (this.#isDoublyLinked) return node.prev || null;
+    // @ts-ignore
+    if (this.#isDoublyLinked) return node!.prev;
 
     // Otherwise, walk the list starting with #head
     let prevNode = this.#head;

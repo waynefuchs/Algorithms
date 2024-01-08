@@ -116,6 +116,7 @@ describe("Linked List", () => {
 
     it("Should push and pop one item correctly with doubly linked lists", () => {
       const ll = new LinkedList({ doublyLinked: true });
+      ll.push("push the first");
       ll.push("HMMMM");
       expect(ll.pop()?.value).toBe("HMMMM");
     });
@@ -193,6 +194,13 @@ describe("Linked List", () => {
       expect(ll.length).toBe(1);
       expect(ll.shift()?.value).toBe("Bravo");
       expect(ll.length).toBe(0);
+    });
+
+    it("Get with invalid index should return null", () => {
+      const ll = new LinkedList();
+      expect(ll.get(-1)).toBeNull();
+      expect(ll.get(1)).toBeNull();
+      expect(ll.get(0)).toBeNull();
     });
   });
 });
