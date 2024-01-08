@@ -27,14 +27,24 @@ export default class LinkedList {
   /*****************************************************************************
    * Read only access to private vars
    ****************************************************************************/
+
+  /**
+   * Number of nodes in the linked list
+   */
   get length(): number {
     return this.#length;
   }
 
+  /**
+   * The first node in the linked list
+   */
   get head(): LinkedListNode | null {
     return this.#head;
   }
 
+  /**
+   * The last node in the linked list
+   */
   get tail(): LinkedListNode | null {
     return this.#tail;
   }
@@ -113,6 +123,10 @@ export default class LinkedList {
     return this.#head;
   }
 
+  /**
+   * Removes the first node in the linked list
+   * @returns The first node in the linked list
+   */
   shift(): LinkedListNode | null {
     // empty list
     if (!this.#head || !this.#tail || this.#length === 0) return null;
@@ -141,6 +155,12 @@ export default class LinkedList {
     return deletedNode;
   }
 
+  /**
+   * Create and insert a node at a specific index
+   * @param index The position to insert a new node
+   * @param value The value contained in the new node
+   * @returns The new node
+   */
   insert(index: number, value: any): LinkedListNode | null {
     if (index < 0 || index > this.#length) return null;
 
