@@ -55,6 +55,18 @@ describe("Linked List", () => {
       expect(ll.length).toBe(nodes.length);
     });
 
+    it("Insert will throw an error when corrupt link data is encountered", () => {
+      const ll = new LinkedList();
+      ll.push("one");
+      ll.push("two");
+      ll.push("three");
+      // break a link
+      !!ll && !!ll.head && (ll.head.next = null);
+      expect(() => {
+        ll.insert(2, "NOPE");
+      }).toThrow(Error);
+    });
+
     it("Will insert things in the correct location", () => {
       const ll = new LinkedList();
       expect(ll.insert(-1, "fail")).toBeNull();
@@ -100,6 +112,12 @@ describe("Linked List", () => {
       const ll = new LinkedList();
       ll.push("oops");
       expect(ll.pop()?.value).toBe("oops");
+    });
+
+    it("Should push and pop one item correctly with doubly linked lists", () => {
+      const ll = new LinkedList({ doublyLinked: true });
+      ll.push("HMMMM");
+      expect(ll.pop()?.value).toBe("HMMMM");
     });
 
     it("Should push and pop more than one item correctly", () => {
