@@ -1,14 +1,22 @@
-type LinkedListNodeProp = {
-  data: any;
-  next: LinkedListNodeProp | null;
-  prev?: LinkedListNodeProp | null;
+type LinkedListNode = {
+  value: any;
+  next: LinkedListNode | null;
+  prev?: LinkedListNode | null;
+};
+
+type LinkedListOptions = {
+  // circular?: boolean;
+  doublyLinked?: boolean;
 };
 
 // - getSize
 // - get(index)
-// - append(item)
+// - push(item)
+// - unshift(item)
 
-// - prepend(item)
+// - pop
+
+// - unshift
 // - insertAt(item, index)
 // - remove(item)
 // - removeAt(index)
@@ -16,110 +24,152 @@ type LinkedListNodeProp = {
 export default class LinkedList {
   #isDoublyLinked;
   #isCircular;
-  #first: LinkedListNodeProp | null;
-  #last: LinkedListNodeProp | null;
-  #size: number;
-  constructor(isDoublyLinked = false, isCircular = false) {
-    this.#isCircular = isCircular;
-    this.#isDoublyLinked = isDoublyLinked;
-    this.#first = null;
-    this.#last = null;
-    this.#size = 0;
+  #head: LinkedListNode | null;
+  #tail: LinkedListNode | null;
+  #length: number;
+  constructor(options: LinkedListOptions = {}) {
+    // this.#isCircular = options?.circular ? options.circular : false;
+    this.#isDoublyLinked = options?.doublyLinked ? options.doublyLinked : false;
+    this.#head = null;
+    this.#tail = null;
+    this.#length = 0;
   }
 
-  /**
-   * Private method to create a linked list node
-   * @param data Data to place in the node
-   * @returns A LinkedListNode object with null links
-   */
-  #createNode(data): LinkedListNodeProp {
-    return {
-      data,
-      next: null,
-      ...(this.#isDoublyLinked ? { prev: null } : {}),
-    };
+  /*****************************************************************************
+   * Read only access to private vars
+   ****************************************************************************/
+  get length(): number {
+    return this.#length;
   }
 
-  /**
-   * Get the first node in the linked list
-   * @returns The first node in the linked list, null if there are no nodes in the linked list
-   */
-  getFirst(): LinkedListNodeProp | null {
-    return this.#first;
+  get head(): LinkedListNode | null {
+    return this.#head;
   }
 
-  /**
-   * Get the last node in the linked list
-   * @returns The last node in the linked list, null if there are no nodes in the linked list
-   */
-  getLast() {
-    return this.#last;
+  get tail(): LinkedListNode | null {
+    return this.#tail;
   }
 
-  /**
-   * Get the number of elements in the linked list
-   * @returns A number representing the number of nodes in the linked list
-   */
-  getSize(): number {
-    return Number(this.#size);
-  }
+  /*****************************************************************************
+   * PUBLIC
+   ****************************************************************************/
 
   /**
    * Create a new node containing data and place it at the end of the linked list
-   * @param data Data to store in the new node
+   * @param value Data to store in the new node
    * @returns The newly created node
    */
-  append(data): LinkedListNodeProp {
-    const newNode = this.#createNode(data);
-    this.#insertAfter(this.#last, newNode);
-    this.#size++;
+  push(value: any): LinkedListNode {
+    const newNode = this.#createNode(value);
+    if (!this.#head || !this.#tail) {
+      this.#head = newNode;
+      this.#tail = newNode;
+    } else {
+      if (this.#isDoublyLinked) newNode.prev = this.#tail;
+      this.#tail.next = newNode;
+      this.#tail = newNode;
+    }
+
+    this.#length++;
     return newNode;
   }
 
   /**
-   * Insert a node into the linked list
-   * @param node Node to insert after
-   * @param newNode The node to be inserted
+   * Remove the last node in the linked list
+   * @returns The removed node or null if node was not removed
    */
-  #insertAfter(
-    node: LinkedListNodeProp | null,
-    newNode: LinkedListNodeProp
-  ): undefined {
-    // Guard against node being null
-    // There is one case in which null is valid, if there aren't any nodes yet in the linked list
-    if (node === null) {
-      if (this.#last === null && this.#first === null && this.#size === 0) {
-        this.#first = newNode;
-        this.#last = newNode;
-        // TODO: Handle circular
-        return;
-      }
-      throw new Error("Invalid state: can not insert a new node after 'null'");
+  pop(): LinkedListNode | null {
+    // empty list
+    if (!this.#head || !this.#tail) return null;
+
+    // Keep a reference
+    const deletedNode: LinkedListNode | null = this.#tail;
+
+    // one node
+    if (this.#length === 1) {
+      this.#head = this.#tail = null;
+      this.#length = 0;
+      return deletedNode;
     }
 
-    // Handle special case if `node` is the last node in the list
-    if (node.next === null) {
-      if (node === this.#last) {
-        node.next = newNode;
-        this.#last = newNode;
-        if (this.#isDoublyLinked) {
-          newNode.prev = node;
-        }
-        // TODO: Handle circular
-        return;
-      }
-      throw new Error("Invalid state: Next node is null but node is not #last");
+    // more than one node
+    const newTail = this.#getPreviousNode(deletedNode);
+    if (newTail === null) throw new Error("Failed to locate new tail");
+    this.#tail = newTail;
+    this.#tail.next = null;
+    this.#length--;
+    return deletedNode;
+  }
+
+  /**
+   * Create a new node containing data and place it at the beginning of the linked list
+   * @param value Data to store in the new node
+   * @returns The newly created node
+   */
+  unshift(value: any): LinkedListNode {
+    const newNode = this.#createNode(value);
+
+    // empty list
+    if (this.#length === 0 || this.#head === null || this.#tail === null) {
+      this.#head = this.#tail = newNode;
+      this.#length = 1;
+      return this.#head;
     }
 
-    // Normal insertion
-    // [node] -> [newNode] -> [nextNode]
-    const nextNode = node.next;
-    node.next = newNode;
+    // at least one node
+    newNode.next = this.#head;
+    if (this.#isDoublyLinked) this.#head.prev = newNode;
+    this.#head = newNode;
+    this.#length++;
+    return this.#head;
+  }
+
+  shift(): LinkedListNode | null {
+    // empty list
+    if (!this.#head || !this.#tail) return null;
+
+    // Keep a reference
+    const deletedNode: LinkedListNode = this.#head;
+
+    // one node
+    if (this.#length === 1) {
+      this.#head = this.#tail = null;
+      this.#length = 0;
+      return deletedNode;
+    }
+
+    // more than one node
+    this.#head = deletedNode.next;
+    if (!this.#head?.next)
+      throw new Error("Second node in linked list should not be null");
+    if (this.#isDoublyLinked) this.#head.prev = null;
+    this.#length--;
+    return deletedNode;
+  }
+
+  insert(index: number, value: any): LinkedListNode | null {
+    if (index < 0 || index > this.#length) return null;
+
+    // at end
+    if (index === this.length) return this.push(value);
+
+    // at beginning
+    if (index === 0) return this.unshift(value);
+
+    // somewhere in the middle
+    const newNode = this.#createNode(value);
+    const prevNode = this.get(index - 1);
+    const nextNode = prevNode?.next || null;
+    if (prevNode === null)
+      throw new Error("Previous node was null in the middle");
     newNode.next = nextNode;
+    prevNode.next = newNode;
     if (this.#isDoublyLinked) {
-      nextNode.prev = newNode;
-      newNode.prev = node;
+      newNode.prev = prevNode;
+      nextNode !== null && (nextNode.prev = newNode);
     }
+    this.#length++;
+    return newNode;
   }
 
   /**
@@ -127,10 +177,52 @@ export default class LinkedList {
    * @param index Numerical index in linked list
    * @returns The node at the index if that index exists, otherwise null
    */
-  get(index: number): LinkedListNodeProp | null {
-    if (index < 0 || index > this.#size || this.#first === null) return null;
-    let node: LinkedListNodeProp | null = this.#first;
+  get(index: number): LinkedListNode | null {
+    if (
+      index < 0 ||
+      index > this.#length - 1 ||
+      this.#head === null ||
+      this.#tail === null
+    )
+      return null;
+
+    // Iterate through list until found
+    let node: LinkedListNode | null = this.#head;
     for (let x = 1; x <= index; x++) node = node?.next || null;
     return node;
+  }
+
+  /*****************************************************************************
+   * PRIVATE
+   ****************************************************************************/
+  /**
+   * Create a linked list node
+   * @param value Data to place in the node
+   * @returns A LinkedListNode object with null links
+   */
+  #createNode(value): LinkedListNode {
+    return {
+      value: value,
+      next: null,
+      ...(this.#isDoublyLinked ? { prev: null } : {}),
+    };
+  }
+
+  /**
+   * The the node just before the reference node
+   * @param node Reference node
+   * @returns The node that links to the reference node via 'next'
+   */
+  #getPreviousNode(node: LinkedListNode): LinkedListNode | null {
+    // Doubly linked list will point back
+    if (this.#isDoublyLinked) return node.prev || null;
+
+    // Otherwise, walk the list starting with #head
+    let prevNode = this.#head;
+    do {
+      if (prevNode?.next === node) break;
+      prevNode = prevNode?.next || null;
+    } while (prevNode !== null);
+    return prevNode;
   }
 }
