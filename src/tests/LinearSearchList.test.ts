@@ -18,4 +18,18 @@ describe("Linear Search List", () => {
       Array(array.length).fill(true)
     );
   });
+
+  it("Should gracefully fail on empty arrays", () => {
+    expect(LinearSearchList([], 5)).toBe(false);
+  });
+
+  it("Should gracefully fail on non-array types", () => {
+    //@ts-ignore
+    expect(LinearSearchList("hi there", "hi")).toBe(false);
+  });
+
+  it("Should gracefully fail if needle is not a number", () => {
+    //@ts-ignore
+    expect(LinearSearchList([1, 2, 3], "hello"));
+  });
 });

@@ -7,7 +7,7 @@
  * @param needle - The number to to search for within haystack
  * @returns - true or false depending on whether the needle was successfully located
  */
-export default function linearSearchList(
+export default function LinearSearchList(
   haystack: number[],
   needle: number
 ): boolean {
