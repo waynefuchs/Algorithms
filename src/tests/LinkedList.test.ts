@@ -209,4 +209,37 @@ describe("Linked List", () => {
       expect(ll.insert(1, "one")?.value).toBe("one");
     });
   });
+
+  describe("Remove", () => {
+    it("Will remove a single item", () => {
+      const ll = new LinkedList();
+      const head = ll.push("How now");
+      expect(ll.remove(head)?.value).toBe("How now");
+      expect(ll.length).toBe(0);
+    });
+
+    it("Will remove head and tail", () => {
+      const ll = new LinkedList();
+      const head = ll.push("How");
+      ll.push("now");
+      ll.push("brown");
+      const tail = ll.push("cow");
+      expect(ll.remove(head)?.value).toBe(head.value);
+      expect(ll.length).toBe(3);
+      expect(ll.remove(tail)?.value).toBe(tail.value);
+      expect(ll.length).toBe(2);
+    });
+
+    it("Will remove from the middle", () => {
+      const ll = new LinkedList();
+      ll.push("How");
+      const middle1 = ll.push("now");
+      const middle2 = ll.push("brown");
+      ll.push("cow");
+      expect(ll.remove(middle1)?.value).toBe(middle1.value);
+      expect(ll.length).toBe(3);
+      expect(ll.remove(middle2)?.value).toBe(middle2.value);
+      expect(ll.length).toBe(2);
+    });
+  });
 });

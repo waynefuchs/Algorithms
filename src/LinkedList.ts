@@ -206,6 +206,35 @@ export default class LinkedList {
     return node;
   }
 
+  remove(node: LinkedListNode): LinkedListNode | null {
+    let nodeToRemove: LinkedListNode | null = this.#head;
+    do {
+      if (nodeToRemove === node) break;
+      nodeToRemove = nodeToRemove!.next;
+    } while (node !== null);
+
+    // Item not found
+    if (nodeToRemove === null) return null;
+
+    // List contains 1 item
+    if (this.#length === 1) {
+      this.#head = this.#tail = nodeToRemove.next = null;
+      "prev" in nodeToRemove && (nodeToRemove.prev = null);
+      this.#length = 0;
+      return nodeToRemove;
+    }
+
+    // Item is tail
+    if (nodeToRemove === this.#tail) return this.pop();
+
+    // Item is head
+    if (nodeToRemove === this.#head) return this.shift();
+
+    console.log("Good news, Getting here", nodeToRemove.value);
+
+    return nodeToRemove;
+  }
+
   /*****************************************************************************
    * PRIVATE
    ****************************************************************************/
