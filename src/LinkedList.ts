@@ -206,7 +206,7 @@ export default class LinkedList {
     return node;
   }
 
-  remove(node: LinkedListNode): LinkedListNode | null {
+  removeNode(node: LinkedListNode): LinkedListNode | null {
     let nodeToRemove: LinkedListNode | null = this.#head;
     let prevNode: LinkedListNode | null = null;
     do {
@@ -241,6 +241,40 @@ export default class LinkedList {
     nodeToRemove.next = null;
     "prev" in nodeToRemove && (nodeToRemove.prev = null);
     this.#length--;
+    return nodeToRemove;
+  }
+
+  removeIndex(index: number): LinkedListNode | null {
+    // Invalid index
+    if (typeof index !== "number" || index < 0 || index >= this.#length)
+      return null;
+
+    // First Node
+    if (index === 0) return this.shift();
+
+    // Last Node
+    if (index === this.#length - 1) return this.pop();
+
+    // Find Node
+    let prevNode: LinkedListNode | null = this.#head;
+    let nodeToRemove: LinkedListNode | null = this.#head!.next;
+    for (let x = 1; x < index; x++) {
+      prevNode = nodeToRemove;
+      nodeToRemove = nodeToRemove!.next;
+    }
+
+    // Remove it
+    if (nodeToRemove === null)
+      throw new Error(`Node to remove is null for index:${index}`);
+    prevNode!.next = nodeToRemove?.next || null;
+    if (this.#isDoublyLinked)
+      !!nodeToRemove!.next &&
+        "prev" in nodeToRemove!.next &&
+        (nodeToRemove!.next.prev = prevNode);
+    nodeToRemove!.next = null;
+    "prev" in nodeToRemove! && (nodeToRemove!.prev = null);
+    this.#length--;
+
     return nodeToRemove;
   }
 

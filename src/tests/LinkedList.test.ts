@@ -210,11 +210,11 @@ describe("Linked List", () => {
     });
   });
 
-  describe("Remove", () => {
+  describe("removeNode", () => {
     it("Will remove a single item", () => {
       const ll = new LinkedList({ doublyLinked: true });
       const head = ll.push("How now");
-      expect(ll.remove(head)?.value).toBe("How now");
+      expect(ll.removeNode(head)?.value).toBe("How now");
       expect(ll.length).toBe(0);
     });
 
@@ -224,9 +224,9 @@ describe("Linked List", () => {
       ll.push("now");
       ll.push("brown");
       const tail = ll.push("cow");
-      expect(ll.remove(head)?.value).toBe(head.value);
+      expect(ll.removeNode(head)?.value).toBe(head.value);
       expect(ll.length).toBe(3);
-      expect(ll.remove(tail)?.value).toBe(tail.value);
+      expect(ll.removeNode(tail)?.value).toBe(tail.value);
       expect(ll.length).toBe(2);
     });
 
@@ -236,9 +236,9 @@ describe("Linked List", () => {
       const middle1 = ll.push("now");
       const middle2 = ll.push("brown");
       ll.push("cow");
-      expect(ll.remove(middle1)?.value).toBe(middle1.value);
+      expect(ll.removeNode(middle1)?.value).toBe(middle1.value);
       expect(ll.length).toBe(3);
-      expect(ll.remove(middle2)?.value).toBe(middle2.value);
+      expect(ll.removeNode(middle2)?.value).toBe(middle2.value);
       expect(ll.length).toBe(2);
     });
 
@@ -247,7 +247,54 @@ describe("Linked List", () => {
       ll.push("testing");
       ll.push("## this will not be found ##");
       const pop = ll.pop();
-      expect(ll.remove(pop!)).toBeNull();
+      expect(ll.removeNode(pop!)).toBeNull();
+    });
+  });
+
+  describe("removeIndex", () => {
+    it("Will remove index 0", () => {
+      const ll = new LinkedList();
+      const head = ll.push("test");
+      expect(ll.removeIndex(0)!.value).toBe(head.value);
+      expect(ll.length).toBe(0);
+    });
+
+    it("Will remove index `length-1`", () => {
+      const ll = new LinkedList();
+      ll.push("test");
+      const tail = ll.push("This one gets removed");
+      expect(ll.length).toBe(2);
+      expect(ll.removeIndex(ll.length - 1)!.value).toBe(tail.value);
+      expect(ll.length).toBe(1);
+    });
+
+    it("Will not remove invalid index", () => {
+      const ll = new LinkedList();
+      // @ts-ignore
+      expect(ll.removeIndex("howdy")).toBeNull();
+      expect(ll.removeIndex(-1)).toBeNull();
+      expect(ll.removeIndex(0)).toBeNull();
+      expect(ll.removeIndex(1)).toBeNull();
+      expect(ll.length).toBe(0);
+      ll.push("Insert data");
+      expect(ll.removeIndex(1)).toBeNull();
+      expect(ll.length).toBe(1);
+    });
+
+    it("Will remove middle indices", () => {
+      const ll = new LinkedList();
+      const head = ll.push("head");
+      const test1 = ll.push("test 1");
+      const test2 = ll.push("test 2");
+      const tail = ll.push("tail");
+      expect(ll.length).toBe(4);
+      expect(ll.removeIndex(1)!.value).toBe(test1.value);
+      expect(ll.removeIndex(1)!.value).toBe(test2.value);
+      expect(ll.removeIndex(1)!.value).toBe(tail.value);
+      expect(ll.length).toBe(1);
+      expect(ll.removeIndex(1)).toBeNull();
+      expect(ll.removeIndex(0)!.value).toBe(head.value);
+      expect(ll.length).toBe(0);
     });
   });
 });
