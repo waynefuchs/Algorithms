@@ -296,5 +296,16 @@ describe("Linked List", () => {
       expect(ll.removeIndex(0)!.value).toBe(head.value);
       expect(ll.length).toBe(0);
     });
+
+    it("Will remove middle indices and activate search code", () => {
+      const ll = new LinkedList({ doublyLinked: true });
+      ll.push("head");
+      ll.push("test 1");
+      const test2 = ll.push("test 2");
+      ll.push("tail");
+      expect(ll.length).toBe(4);
+      expect(ll.removeIndex(2)!.value).toBe(test2.value);
+      expect(ll.length).toBe(3);
+    });
   });
 });

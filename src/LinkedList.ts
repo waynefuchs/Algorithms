@@ -264,9 +264,7 @@ export default class LinkedList {
     }
 
     // Remove it
-    if (nodeToRemove === null)
-      throw new Error(`Node to remove is null for index:${index}`);
-    prevNode!.next = nodeToRemove?.next || null;
+    prevNode!.next = nodeToRemove!.next;
     if (this.#isDoublyLinked)
       !!nodeToRemove!.next &&
         "prev" in nodeToRemove!.next &&
