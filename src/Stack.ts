@@ -18,6 +18,10 @@ export default class Stack<T> {
     return this.#length;
   }
 
+  /**
+   * Add a value to the top of the stack
+   * @param value Value to add to the top of the stack
+   */
   push(value: T) {
     const node = { value } as StackNode<T>;
 
@@ -32,15 +36,30 @@ export default class Stack<T> {
     this.#length++;
   }
 
+  /**
+   * Remove value from top of stack
+   * @returns Value from top of stack
+   */
   pop(): T | undefined {
+    // Error check
     if (!this.#head || !this.#tail || this.length <= 0) return undefined;
-    const node = this.#head;
+
+    // Remove the node and decrement length
+    const popNode = this.#head as StackNode<T>;
     this.#head = this.#head.prev;
-    this.#length--;
+    this.#length = Math.max(0, this.#length - 1);
+
+    // if length has reached 0, set head and tail to default state
     if (this.#length === 0) this.#head = this.#tail = undefined;
-    return node.value;
+
+    // Return the value
+    return popNode.value;
   }
 
+  /**
+   * Look at top of stack without mutating stack
+   * @returns Value from top of stack
+   */
   peek(): T | undefined {
     if (!this.#head || !this.#tail || this.#length <= 0) return undefined;
     return this.#head.value;
