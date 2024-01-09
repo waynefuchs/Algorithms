@@ -212,7 +212,7 @@ describe("Linked List", () => {
 
   describe("Remove", () => {
     it("Will remove a single item", () => {
-      const ll = new LinkedList();
+      const ll = new LinkedList({ doublyLinked: true });
       const head = ll.push("How now");
       expect(ll.remove(head)?.value).toBe("How now");
       expect(ll.length).toBe(0);
@@ -240,6 +240,14 @@ describe("Linked List", () => {
       expect(ll.length).toBe(3);
       expect(ll.remove(middle2)?.value).toBe(middle2.value);
       expect(ll.length).toBe(2);
+    });
+
+    it("Will not remove a null input", () => {
+      const ll = new LinkedList();
+      ll.push("testing");
+      ll.push("## this will not be found ##");
+      const pop = ll.pop();
+      expect(ll.remove(pop!)).toBeNull();
     });
   });
 });
