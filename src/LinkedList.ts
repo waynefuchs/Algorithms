@@ -233,9 +233,7 @@ export default class LinkedList {
     if (nodeToRemove === this.#head) return this.shift();
 
     // Item is in the middle
-    if (prevNode === null)
-      throw new Error("Previous item isn't head, but is also null");
-    prevNode.next = nodeToRemove.next;
+    prevNode!.next = nodeToRemove.next;
     if (this.#isDoublyLinked)
       !!nodeToRemove.next &&
         "prev" in nodeToRemove.next &&
