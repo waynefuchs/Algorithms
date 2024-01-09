@@ -213,7 +213,7 @@ export default class LinkedList {
       if (nodeToRemove === node) break;
       prevNode = nodeToRemove;
       nodeToRemove = nodeToRemove!.next;
-    } while (node !== null);
+    } while (nodeToRemove !== null);
 
     // Item not found
     if (nodeToRemove === null) return null;
