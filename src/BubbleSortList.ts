@@ -1,5 +1,12 @@
+// Bubble Sort
+// Where n is the length of the array
+// Where t is the number of passes
+// Make n-t passes through an array
+// Swapping each array value with its neighbor if that value is greater
+// For every pass it is guaranteed that the largest value in the array is shifted to the end
+
 /**
- * Mutably sorts a list.
+ * Mutably sorts a list. O(n^2)
  * @param list A number array to be sorted
  */
 export default function BubbleSortList(
