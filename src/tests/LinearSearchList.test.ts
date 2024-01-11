@@ -32,4 +32,16 @@ describe("Linear Search List", () => {
     //@ts-ignore
     expect(LinearSearchList([1, 2, 3], "hello"));
   });
+
+  describe("Tests by The Primeagen", () => {
+    test("linear search array", function () {
+      const foo = [1, 3, 4, 69, 71, 81, 90, 99, 420, 1337, 69420];
+      expect(LinearSearchList(foo, 69)).toEqual(true);
+      expect(LinearSearchList(foo, 1336)).toEqual(false);
+      expect(LinearSearchList(foo, 69420)).toEqual(true);
+      expect(LinearSearchList(foo, 69421)).toEqual(false);
+      expect(LinearSearchList(foo, 1)).toEqual(true);
+      expect(LinearSearchList(foo, 0)).toEqual(false);
+    });
+  });
 });
