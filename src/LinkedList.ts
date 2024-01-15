@@ -1,313 +1,290 @@
-type LinkedListNode = {
-  value: any;
-  next: LinkedListNode | null;
-  prev?: LinkedListNode | null;
+/**
+ * @internal This type is only useful in the LinkedList class
+ * @param value the value of the node
+ * @param next link to the next node, not present if no link exists
+ * @param prev link to the previous node, not present if no link exits
+ */
+type LinkedListNode<T> = {
+  value: T;
+  next?: LinkedListNode<T>;
+  prev?: LinkedListNode<T>;
 };
 
-// TODO: Implement Circular (maybe..someday)
+/**
+ * Using a Key/Value pair forces option visibility at time of list creation
+ * @param doublyLinked boolean to define whether a linked list is doubly linked or not
+ */
 type LinkedListOptions = {
-  // circular?: boolean;
   doublyLinked?: boolean;
 };
 
-export default class LinkedList {
-  #isDoublyLinked;
-  #isCircular;
-  #head: LinkedListNode | null;
-  #tail: LinkedListNode | null;
+/**
+ * @internal This type is only useful in the LinkedList class
+ * @remarks This type is used for node insertion and removal
+ * @param nodeA The node directly before nodeB
+ * @param nodeB The node directly after nodeA
+ */
+type LinkedListNodePair<T> = {
+  nodeA?: LinkedListNode<T>;
+  nodeB?: LinkedListNode<T>;
+};
+
+export default class LinkedList<T> {
+  #head?: LinkedListNode<T>;
+  #tail?: LinkedListNode<T>;
+  #doublyLinked: boolean;
   #length: number;
+
   constructor(options: LinkedListOptions = {}) {
-    // this.#isCircular = options?.circular ? options.circular : false;
-    this.#isDoublyLinked = options?.doublyLinked ? options.doublyLinked : false;
-    this.#head = null;
-    this.#tail = null;
+    this.#head = this.#tail = undefined;
     this.#length = 0;
+    this.#doublyLinked = options?.doublyLinked ? true : false;
   }
 
-  /*****************************************************************************
-   * Read only access to private vars
-   ****************************************************************************/
-
-  /**
-   * Number of nodes in the linked list
-   */
   get length(): number {
     return this.#length;
   }
 
   /**
-   * The first node in the linked list
+   * Add a value to the end of this linked list
+   * @param value Value to add
    */
-  get head(): LinkedListNode | null {
-    return this.#head;
-  }
+  push(value: T) {
+    const node = { value } as LinkedListNode<T>;
 
-  /**
-   * The last node in the linked list
-   */
-  get tail(): LinkedListNode | null {
-    return this.#tail;
-  }
-
-  /*****************************************************************************
-   * PUBLIC
-   ****************************************************************************/
-
-  /**
-   * Create a new node containing data and place it at the end of the linked list
-   * @param value Data to store in the new node
-   * @returns The newly created node
-   */
-  push(value: any): LinkedListNode {
-    const newNode = this.#createNode(value);
-    if (!this.#head || !this.#tail) {
-      this.#head = newNode;
-      this.#tail = newNode;
-    } else {
-      if (this.#isDoublyLinked) newNode.prev = this.#tail;
-      this.#tail.next = newNode;
-      this.#tail = newNode;
-    }
-
-    this.#length++;
-    return newNode;
-  }
-
-  /**
-   * Remove the last node in the linked list
-   * @returns The removed node or null if node was not removed
-   */
-  pop(): LinkedListNode | null {
-    // empty list
-    if (!this.#head || !this.#tail) return null;
-
-    // Keep a reference
-    const deletedNode: LinkedListNode | null = this.#tail;
-
-    // one node
-    if (this.#length === 1) {
-      this.#head = this.#tail = null;
-      this.#length = 0;
-      return deletedNode;
-    }
-
-    // more than one node
-    const newTail = this.#getPreviousNode(deletedNode);
-    if (newTail === null) throw new Error("Failed to locate new tail");
-    this.#tail = newTail;
-    this.#tail.next = null;
-    this.#length--;
-    return deletedNode;
-  }
-
-  /**
-   * Create a new node containing data and place it at the beginning of the linked list
-   * @param value Data to store in the new node
-   * @returns The newly created node
-   */
-  unshift(value: any): LinkedListNode {
-    const newNode = this.#createNode(value);
-
-    // empty list
-    if (this.#length === 0 || this.#head === null || this.#tail === null) {
-      this.#head = this.#tail = newNode;
+    if (this.#length === 0 || !this.#tail || !this.#head) {
+      this.#head = this.#tail = node;
       this.#length = 1;
-      return this.#head;
+      return;
     }
 
-    // at least one node
-    newNode.next = this.#head;
-    if (this.#isDoublyLinked) this.#head.prev = newNode;
-    this.#head = newNode;
+    if (this.#doublyLinked) node.prev = this.#tail;
+    this.#tail.next = node;
+    this.#tail = node;
     this.#length++;
-    return this.#head;
   }
 
   /**
-   * Removes the first node in the linked list
-   * @returns The first node in the linked list
+   * Remove all nodes in the Linked List
    */
-  shift(): LinkedListNode | null {
-    // empty list
-    if (!this.#head || !this.#tail || this.#length === 0) return null;
+  removeAll() {
+    this.#head = this.#tail = undefined;
+    this.#length = 0;
+  }
 
-    // Keep a reference
-    const deletedNode: LinkedListNode = this.#head;
+  /**
+   * Add a value to the front of this linked list
+   * @param value Value to add
+   */
+  unshift(value: T) {
+    const node = { value } as LinkedListNode<T>;
 
-    // one node
-    if (this.#length === 1) {
-      this.#head = this.#tail = null;
-      this.#length = 0;
-      return deletedNode;
-    }
+    // push and unshift are identical on 0-length linked list
+    if (this.#length === 0 || !this.#head || !this.#tail)
+      return this.push(value);
 
-    // more than one node
-    this.#head = deletedNode.next;
-    deletedNode.next = null;
-    if (!this.#head) {
-      throw new Error("Second node in linked list should not be null");
+    node.next = this.#head;
+    if (this.#doublyLinked) this.#head.prev = node;
+    this.#head = node;
+    this.#length++;
+  }
+
+  /**
+   * Remove and return the value from the tail of the linked list
+   * @returns Value at the end of the linked list
+   */
+  pop(): T | undefined {
+    // pop with nothing in the list (undefined)
+    if (this.#length === 0 || !this.#head || !this.#tail) return;
+
+    const node = this.#tail;
+    if (this.#length === 1) this.removeAll();
+    else {
+      let newTail: LinkedListNode<T> | undefined = this.#head;
+      if (this.#doublyLinked) newTail = this.#tail.prev;
+      else {
+        for (let x = 1; x < this.#length - 1 && !!newTail; x++)
+          newTail = newTail?.next;
+      }
+      if (!newTail) throw new Error("Failed to locate previous node");
+      delete newTail.next;
+      this.#tail = newTail;
+      this.#length--;
     }
-    if (this.#isDoublyLinked) {
-      this.#head.prev = null;
-      deletedNode.prev = null;
+    return node.value;
+  }
+
+  /**
+   * Remove and return the value from the head of the linked list
+   * @returns Value from the front of the linked list
+   */
+  shift(): T | undefined {
+    if (this.#length === 0 || !this.#head || !this.#tail) return;
+
+    const node = this.#head;
+    if (this.length === 1) this.removeAll();
+    else {
+      this.#head = this.#head.next;
+      delete this.#head?.prev; // can do this, even if not doubly linked
+      this.#length--;
     }
+    return node.value;
+  }
+
+  /**
+   * @private
+   * Get the edge nodes around a removed
+   * @param index insertion index
+   * @returns node at index-1
+   */
+  #getNodePairAt(index: number): LinkedListNodePair<T> {
+    if (index === 0)
+      return this.#head && this.#length > 0 ? { nodeB: this.#head } : {};
+    if (index >= this.#length) return {};
+
+    // locate previous node
+    let nodePrev = this.#head;
+    for (let x = 1; x < index; x++) nodePrev = nodePrev?.next;
+    // validate located node
+    if (!nodePrev) throw new Error(`Fail: locate node at index ${index}`);
+    // and the next node
+    const nodeNext = nodePrev.next;
+    if (!nodeNext) throw new Error(`Fail: locate node.next at index ${index}`);
+    return { nodeA: nodePrev, nodeB: nodeNext } as LinkedListNodePair<T>;
+  }
+
+  /**
+   * @private
+   * Remove nodeB from the list, using a node pair
+   * @param nodePair nodeA -> nodeB(target) -> [nodeC]
+   * @returns The value of the removed node (nodeB.value)
+   */
+  #removeUsingNodePair(nodePair) {
+    if (!nodePair.nodeB) return;
+    // Keep reference for the "next" node
+    const nodeC = nodePair.nodeB?.next;
+    // A.next -> C
+    if (nodePair.nodeA) nodePair.nodeA.next = nodeC;
+    // A <- C.prev
+    if (this.#doublyLinked && nodeC) nodeC.prev = nodePair.nodeA;
+    // housekeeping
     this.#length--;
-    return deletedNode;
+    return nodePair.nodeB.value;
   }
 
   /**
-   * Create and insert a node at a specific index
-   * @param index The position to insert a new node
-   * @param value The value contained in the new node
-   * @returns The new node
+   * Add value to list at specified index
+   * @param value Value to add
+   * @param index Position to place value
    */
-  insert(index: number, value: any): LinkedListNode | null {
-    if (index < 0 || index > this.#length) return null;
-
-    // at beginning
+  insertAt(value: T, index: number) {
+    if (index > this.length || index < 0) return;
     if (index === 0) return this.unshift(value);
-
-    // at end
     if (index === this.length) return this.push(value);
 
-    // somewhere in the middle
-    const newNode = this.#createNode(value);
-    const prevNode = this.get(index - 1);
-    const nextNode = prevNode?.next || null;
-    if (prevNode === null)
-      throw new Error("Previous node was null in the middle");
-    newNode.next = nextNode;
-    prevNode.next = newNode;
-    if (this.#isDoublyLinked) {
-      newNode.prev = prevNode;
-      nextNode !== null && (nextNode.prev = newNode);
-    }
+    const node = { value } as LinkedListNode<T>;
+    const { nodeA: nodePrev, nodeB: nodeNext } = this.#getNodePairAt(index);
     this.#length++;
-    return newNode;
+
+    // Always: forward links
+    if (nodePrev) nodePrev.next = node;
+    node.next = nodeNext;
+
+    // Sometimes: back links only if this is a doubly linked list
+    if (this.#doublyLinked) {
+      if (nodeNext) nodeNext.prev = node;
+      node.prev = nodePrev;
+    }
   }
 
   /**
-   * Iterate through the list and return the node at the supplied index
-   * @param index Numerical index in linked list
-   * @returns The node at the index if that index exists, otherwise null
+   * Remove the node at specified index
+   * @param index removal index
+   * @returns value removed
    */
-  get(index: number): LinkedListNode | null {
-    if (
-      index < 0 ||
-      index > this.#length - 1 ||
-      this.#head === null ||
-      this.#tail === null
-    )
-      return null;
-
-    // Iterate through list until found
-    let node: LinkedListNode | null = this.#head;
-    for (let x = 1; x <= index; x++) node = node?.next || null;
-    return node;
-  }
-
-  removeNode(node: LinkedListNode): LinkedListNode | null {
-    let nodeToRemove: LinkedListNode | null = this.#head;
-    let prevNode: LinkedListNode | null = null;
-    do {
-      if (nodeToRemove === node) break;
-      prevNode = nodeToRemove;
-      nodeToRemove = nodeToRemove!.next;
-    } while (nodeToRemove !== null);
-
-    // Item not found
-    if (nodeToRemove === null) return null;
-
-    // List contains 1 item
-    if (this.#length === 1) {
-      this.#head = this.#tail = nodeToRemove.next = null;
-      "prev" in nodeToRemove && (nodeToRemove.prev = null);
-      this.#length = 0;
-      return nodeToRemove;
-    }
-
-    // Item is tail
-    if (nodeToRemove === this.#tail) return this.pop();
-
-    // Item is head
-    if (nodeToRemove === this.#head) return this.shift();
-
-    // Item is in the middle
-    prevNode!.next = nodeToRemove.next;
-    if (this.#isDoublyLinked)
-      !!nodeToRemove.next &&
-        "prev" in nodeToRemove.next &&
-        (nodeToRemove.next.prev = prevNode);
-    nodeToRemove.next = null;
-    "prev" in nodeToRemove && (nodeToRemove.prev = null);
-    this.#length--;
-    return nodeToRemove;
-  }
-
-  removeIndex(index: number): LinkedListNode | null {
-    // Invalid index
-    if (typeof index !== "number" || index < 0 || index >= this.#length)
-      return null;
-
-    // First Node
+  removeAt(index: number): T | undefined {
+    if (index >= this.#length || index < 0) return;
     if (index === 0) return this.shift();
+    if (index === this.length - 1) return this.pop();
 
-    // Last Node
-    if (index === this.#length - 1) return this.pop();
-
-    // Find Node
-    let prevNode: LinkedListNode | null = this.#head;
-    let nodeToRemove: LinkedListNode | null = this.#head!.next;
-    for (let x = 1; x < index; x++) {
-      prevNode = nodeToRemove;
-      nodeToRemove = nodeToRemove!.next;
-    }
-
-    // Remove it
-    prevNode!.next = nodeToRemove!.next;
-    if (this.#isDoublyLinked)
-      !!nodeToRemove!.next &&
-        "prev" in nodeToRemove!.next &&
-        (nodeToRemove!.next.prev = prevNode);
-    nodeToRemove!.next = null;
-    "prev" in nodeToRemove! && (nodeToRemove!.prev = null);
-    this.#length--;
-
-    return nodeToRemove;
-  }
-
-  /*****************************************************************************
-   * PRIVATE
-   ****************************************************************************/
-  /**
-   * Create a linked list node
-   * @param value Data to place in the node
-   * @returns A LinkedListNode object with null links
-   */
-  #createNode(value): LinkedListNode {
-    return {
-      value: value,
-      next: null,
-      ...(this.#isDoublyLinked ? { prev: null } : {}),
-    };
+    return this.#removeUsingNodePair(this.#getNodePairAt(index));
   }
 
   /**
-   * The the node just before the reference node
-   * @param node Reference node
-   * @returns The node that links to the reference node via 'next'
+   * Search for a value and remove the first instance of it from the linked list
+   * @param value Value to search for
+   * @returns The value removed or undefined
    */
-  #getPreviousNode(node: LinkedListNode): LinkedListNode | null {
-    // Doubly linked list will point back
-    // @ts-ignore
-    if (this.#isDoublyLinked) return node!.prev;
+  remove(value: T): T | undefined {
+    if (!this.#head || !this.#tail) return;
+    if (this.#head.value === value) return this.shift();
+    if (this.#tail.value === value) return this.pop();
 
-    // Otherwise, walk the list starting with #head
-    let prevNode = this.#head;
+    let nodeA = this.#head;
+    let nodeB = nodeA.next;
+    let isFound = false;
     do {
-      if (prevNode?.next === node) break;
-      prevNode = prevNode?.next || null;
-    } while (prevNode !== null);
-    return prevNode;
+      if (!nodeB) return;
+      if (nodeB.value === value) {
+        isFound = true;
+        break;
+      }
+      nodeA = nodeB;
+      nodeB = nodeB.next;
+    } while (nodeB && nodeA);
+    if (!isFound) return;
+
+    return this.#removeUsingNodePair({ nodeA, nodeB } as LinkedListNodePair<T>);
+  }
+
+  /**
+   * View the value at a specified index
+   * @param index Index
+   * @returns Value at specified index
+   */
+  getAt(index: number): T | undefined {
+    if (index >= this.#length || index < 0) return;
+    const { nodeA, nodeB: node } = this.#getNodePairAt(index);
+    return node?.value;
+  }
+
+  /**
+   * Create an array holding the contents of the linked list
+   * @remarks This can be a somewhat performance heavy operation
+   * @returns The Linked List as an array
+   */
+  asArray(): T[] {
+    const arr = new Array<T>();
+    let node = this.#head;
+    do {
+      if (!node) break;
+      arr.push(node.value);
+      node = node?.next;
+    } while (node);
+    return arr;
+  }
+
+  /**
+   * Alias for push (to support ThePrimeagen tests)
+   * @deprecated
+   */
+  append(value: T) {
+    this.push(value);
+  }
+
+  /**
+   * Alias for getAt (to support ThePrimeagen tests)
+   * @deprecated
+   */
+  get(index: number): T | undefined {
+    return this.getAt(index);
+  }
+
+  /**
+   * Alias for unshift (to support ThePrimeagen tests)
+   * @deprecated
+   */
+  prepend(value: T) {
+    this.unshift(value);
   }
 }
