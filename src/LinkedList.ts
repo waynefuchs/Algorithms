@@ -41,94 +41,13 @@ export default class LinkedList<T> {
     this.#doublyLinked = options?.doublyLinked ? true : false;
   }
 
+  /* Getters and setters ******************************************************/
+
   get length(): number {
     return this.#length;
   }
 
-  /**
-   * Add a value to the end of this linked list
-   * @param value Value to add
-   */
-  push(value: T) {
-    const node = { value } as LinkedListNode<T>;
-
-    if (this.#length === 0 || !this.#tail || !this.#head) {
-      this.#head = this.#tail = node;
-      this.#length = 1;
-      return;
-    }
-
-    if (this.#doublyLinked) node.prev = this.#tail;
-    this.#tail.next = node;
-    this.#tail = node;
-    this.#length++;
-  }
-
-  /**
-   * Remove all nodes in the Linked List
-   */
-  removeAll() {
-    this.#head = this.#tail = undefined;
-    this.#length = 0;
-  }
-
-  /**
-   * Add a value to the front of this linked list
-   * @param value Value to add
-   */
-  unshift(value: T) {
-    const node = { value } as LinkedListNode<T>;
-
-    // push and unshift are identical on 0-length linked list
-    if (this.#length === 0 || !this.#head || !this.#tail)
-      return this.push(value);
-
-    node.next = this.#head;
-    if (this.#doublyLinked) this.#head.prev = node;
-    this.#head = node;
-    this.#length++;
-  }
-
-  /**
-   * Remove and return the value from the tail of the linked list
-   * @returns Value at the end of the linked list
-   */
-  pop(): T | undefined {
-    // pop with nothing in the list (undefined)
-    if (this.#length === 0 || !this.#head || !this.#tail) return;
-
-    const node = this.#tail;
-    if (this.#length === 1) this.removeAll();
-    else {
-      let newTail: LinkedListNode<T> | undefined = this.#head;
-      if (this.#doublyLinked) newTail = this.#tail.prev;
-      else {
-        for (let x = 1; x < this.#length - 1 && !!newTail; x++)
-          newTail = newTail?.next;
-      }
-      if (newTail) delete newTail.next;
-      this.#tail = newTail;
-      this.#length--;
-    }
-    return node.value;
-  }
-
-  /**
-   * Remove and return the value from the head of the linked list
-   * @returns Value from the front of the linked list
-   */
-  shift(): T | undefined {
-    if (this.#length === 0 || !this.#head || !this.#tail) return;
-
-    const node = this.#head;
-    if (this.length === 1) this.removeAll();
-    else {
-      this.#head = this.#head.next;
-      delete this.#head?.prev; // can do this, even if not doubly linked
-      this.#length--;
-    }
-    return node.value;
-  }
+  /* Private ******************************************************************/
 
   /**
    * @private
@@ -164,6 +83,35 @@ export default class LinkedList<T> {
     return nodePair.nodeB.value;
   }
 
+  /* Public *******************************************************************/
+
+  /**
+   * Create an array holding the contents of the linked list
+   * @remarks This can be a somewhat performance heavy operation
+   * @returns The Linked List as an array
+   */
+  asArray(): T[] {
+    const arr = new Array<T>();
+    let node = this.#head;
+    do {
+      if (!node) break;
+      arr.push(node.value);
+      node = node?.next;
+    } while (node);
+    return arr;
+  }
+
+  /**
+   * View the value at a specified index
+   * @param index Index
+   * @returns Value at specified index
+   */
+  getAt(index: number): T | undefined {
+    if (index >= this.#length || index < 0) return;
+    const { nodeB: node } = this.#getNodePairAt(index);
+    return node?.value;
+  }
+
   /**
    * Add value to list at specified index
    * @param value Value to add
@@ -190,16 +138,46 @@ export default class LinkedList<T> {
   }
 
   /**
-   * Remove the node at specified index
-   * @param index removal index
-   * @returns value removed
+   * Remove and return the value from the tail of the linked list
+   * @returns Value at the end of the linked list
    */
-  removeAt(index: number): T | undefined {
-    if (index >= this.#length || index < 0) return;
-    if (index === 0) return this.shift();
-    if (index === this.length - 1) return this.pop();
+  pop(): T | undefined {
+    // pop with nothing in the list (undefined)
+    if (this.#length === 0 || !this.#head || !this.#tail) return;
 
-    return this.#removeUsingNodePair(this.#getNodePairAt(index));
+    const node = this.#tail;
+    if (this.#length === 1) this.removeAll();
+    else {
+      let newTail: LinkedListNode<T> | undefined = this.#head;
+      if (this.#doublyLinked) newTail = this.#tail.prev;
+      else {
+        for (let x = 1; x < this.#length - 1 && !!newTail; x++)
+          newTail = newTail?.next;
+      }
+      if (newTail) delete newTail.next;
+      this.#tail = newTail;
+      this.#length--;
+    }
+    return node.value;
+  }
+
+  /**
+   * Add a value to the end of this linked list
+   * @param value Value to add
+   */
+  push(value: T) {
+    const node = { value } as LinkedListNode<T>;
+
+    if (this.#length === 0 || !this.#tail || !this.#head) {
+      this.#head = this.#tail = node;
+      this.#length = 1;
+      return;
+    }
+
+    if (this.#doublyLinked) node.prev = this.#tail;
+    this.#tail.next = node;
+    this.#tail = node;
+    this.#length++;
   }
 
   /**
@@ -230,31 +208,76 @@ export default class LinkedList<T> {
   }
 
   /**
-   * View the value at a specified index
-   * @param index Index
-   * @returns Value at specified index
+   * Remove all nodes in the Linked List
+   * @returns Number of nodes that were unlinked
    */
-  getAt(index: number): T | undefined {
-    if (index >= this.#length || index < 0) return;
-    const { nodeA, nodeB: node } = this.#getNodePairAt(index);
-    return node?.value;
+  removeAll(): number {
+    // In case any nodes are held elsewhere in memory
+    let node = this.#head;
+    let unlinkCount = 0;
+    do {
+      const currentNode = node;
+      node = node?.next;
+      delete currentNode?.prev;
+      delete currentNode?.next;
+      unlinkCount++;
+    } while (node);
+
+    // housekeeping, and GC will do the rest
+    this.#head = this.#tail = undefined;
+    this.#length = 0;
+
+    return unlinkCount;
   }
 
   /**
-   * Create an array holding the contents of the linked list
-   * @remarks This can be a somewhat performance heavy operation
-   * @returns The Linked List as an array
+   * Remove the node at specified index
+   * @param index removal index
+   * @returns value removed
    */
-  asArray(): T[] {
-    const arr = new Array<T>();
-    let node = this.#head;
-    do {
-      if (!node) break;
-      arr.push(node.value);
-      node = node?.next;
-    } while (node);
-    return arr;
+  removeAt(index: number): T | undefined {
+    if (index >= this.#length || index < 0) return;
+    if (index === 0) return this.shift();
+    if (index === this.length - 1) return this.pop();
+
+    return this.#removeUsingNodePair(this.#getNodePairAt(index));
   }
+
+  /**
+   * Remove and return the value from the head of the linked list
+   * @returns Value from the front of the linked list
+   */
+  shift(): T | undefined {
+    if (this.#length === 0 || !this.#head || !this.#tail) return;
+
+    const node = this.#head;
+    if (this.length === 1) this.removeAll();
+    else {
+      this.#head = this.#head.next;
+      delete this.#head?.prev; // can do this, even if not doubly linked
+      this.#length--;
+    }
+    return node.value;
+  }
+
+  /**
+   * Add a value to the front of this linked list
+   * @param value Value to add
+   */
+  unshift(value: T) {
+    const node = { value } as LinkedListNode<T>;
+
+    // push and unshift are identical on 0-length linked list
+    if (this.#length === 0 || !this.#head || !this.#tail)
+      return this.push(value);
+
+    node.next = this.#head;
+    if (this.#doublyLinked) this.#head.prev = node;
+    this.#head = node;
+    this.#length++;
+  }
+
+  /* Alias ********************************************************************/
 
   /**
    * Alias for push (to support ThePrimeagen tests)
