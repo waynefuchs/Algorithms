@@ -27,8 +27,13 @@ describe("Linked List", () => {
     });
   });
 
-  test("Unshifting values and then popping them off results in correct order (FIFO)", () => {
+  test("Shifting in error behaves as expected", () => {
     const ll = new LinkedList();
+    expect(ll.shift()).toBeUndefined();
+  });
+
+  test("Unshifting values and then popping them off results in correct order (FIFO)", () => {
+    const ll = new LinkedList({ doublyLinked: true });
     const values = ["one", "two", "three", "four", "five"];
     values.forEach((v, i) => {
       ll.unshift(v);
@@ -53,8 +58,28 @@ describe("Linked List", () => {
     });
   });
 
+  test("Edge case for insertAt: index, negative out of bounds", () => {
+    const ll = new LinkedList({ doublyLinked: true });
+    ll.insertAt("hello", -1);
+    expect(ll.length).toBe(0);
+  });
+  test("Edge case for insertAt: index, positive out of bounds", () => {
+    const ll = new LinkedList({ doublyLinked: true });
+    ll.insertAt("hello", 1);
+    expect(ll.length).toBe(0);
+  });
+  test("Edge case for insertAt: Properly aliases unshift and push", () => {
+    const ll = new LinkedList({ doublyLinked: true });
+    // testing insertion at postion "0" (should alias unshift)
+    ll.insertAt("hello", 0);
+    expect(ll.length).toBe(1);
+    // testing insertion at postion "1" (should alias push)
+    ll.insertAt("world", 1);
+    expect(ll.length).toBe(2);
+  });
+
   test("Ensure insertAt inserts values in the correct location", () => {
-    const ll = new LinkedList();
+    const ll = new LinkedList({ doublyLinked: true });
     const values = ["one", "two", "three", "four", "five"];
     ll.insertAt("First", 0);
     ll.insertAt("Last", 1);
@@ -68,6 +93,35 @@ describe("Linked List", () => {
 
     values.forEach((v) => expect(ll.pop()).toBe(v));
     expect(ll.length).toBe(0);
+  });
+
+  test("Edge case for remove: List has no items", () => {
+    const ll = new LinkedList({ doublyLinked: true });
+    expect(ll.remove("I can not exist")).toBeUndefined();
+    expect(ll.length).toBe(0);
+  });
+
+  test("Removing an item that doesn't exist in the list fails as expected", () => {
+    const ll = new LinkedList({ doublyLinked: true });
+    ll.push("I exist");
+    expect(ll.remove("But, I can not exist")).toBeUndefined();
+    expect(ll.length).toBe(1);
+  });
+
+  test("Removing from the list with > two elements engages do..while safeguard", () => {
+    const ll = new LinkedList({ doublyLinked: true });
+    ll.push("Filler");
+    ll.push("Filler");
+    ll.push("Filler");
+    ll.push("I exist");
+    expect(ll.remove("I exist")).toBe("I exist");
+    expect(ll.remove("I exist")).toBeUndefined();
+    expect(ll.length).toBe(3);
+  });
+
+  test("Expect asArray to return an empty array if the linked list is empty", () => {
+    const ll = new LinkedList({ doublyLinked: true });
+    expect(ll.asArray()).toEqual([]);
   });
 
   test("Ensure removeAt exception cases work properly", () => {
@@ -100,7 +154,11 @@ describe("Linked List", () => {
   });
 
   test("Ensure removeAt returns and removes the correct value", () => {
-    const ll = new LinkedList();
+    const ll = new LinkedList({ doublyLinked: true });
+
+    ll.push("First");
+    expect(ll.removeAt(0)).toBe("First");
+
     const values = [
       "one",
       "two",
@@ -161,6 +219,8 @@ describe("Linked List", () => {
       "ten",
     ];
     values.forEach((v) => ll.push(v));
+    ll.insertAt("BOOM", 1);
+    expect(ll.remove("BOOM")).toBe("BOOM");
     expect(ll.length).toBe(values.length);
     values.reverse().forEach((v) => expect(ll.remove(v)).toBe(v));
     expect(ll.length).toBe(0);
