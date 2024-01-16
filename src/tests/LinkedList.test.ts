@@ -1,3 +1,4 @@
+import DataAnalysis from "../DataAnalysis";
 import LinkedList from "../LinkedList";
 
 describe("Linked List", () => {
@@ -223,6 +224,16 @@ describe("Linked List", () => {
     expect(ll.remove("BOOM")).toBe("BOOM");
     expect(ll.length).toBe(values.length);
     values.reverse().forEach((v) => expect(ll.remove(v)).toBe(v));
+    expect(ll.length).toBe(0);
+  });
+
+  test("Linked List can be cleared with removeAll", () => {
+    const ll = new LinkedList();
+    const count = 10_000;
+    const data = DataAnalysis.getRandomList(1000, -500, count);
+    data.forEach((v) => ll.push(v));
+    expect(ll.length).toBe(count);
+    expect(ll.removeAll()).toBe(count);
     expect(ll.length).toBe(0);
   });
 
