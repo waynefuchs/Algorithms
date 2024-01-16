@@ -106,8 +106,7 @@ export default class LinkedList<T> {
         for (let x = 1; x < this.#length - 1 && !!newTail; x++)
           newTail = newTail?.next;
       }
-      if (!newTail) throw new Error("Failed to locate previous node");
-      delete newTail.next;
+      if (newTail) delete newTail.next;
       this.#tail = newTail;
       this.#length--;
     }
@@ -138,19 +137,13 @@ export default class LinkedList<T> {
    * @returns node at index-1
    */
   #getNodePairAt(index: number): LinkedListNodePair<T> {
-    if (index === 0)
-      return this.#head && this.#length > 0 ? { nodeB: this.#head } : {};
-    if (index >= this.#length) return {};
-
+    if (index === 0) return { nodeB: this.#head };
     // locate previous node
     let nodePrev = this.#head;
     for (let x = 1; x < index; x++) nodePrev = nodePrev?.next;
     // validate located node
-    if (!nodePrev) throw new Error(`Fail: locate node at index ${index}`);
     // and the next node
-    const nodeNext = nodePrev.next;
-    if (!nodeNext) throw new Error(`Fail: locate node.next at index ${index}`);
-    return { nodeA: nodePrev, nodeB: nodeNext } as LinkedListNodePair<T>;
+    return { nodeA: nodePrev, nodeB: nodePrev?.next } as LinkedListNodePair<T>;
   }
 
   /**
@@ -160,7 +153,6 @@ export default class LinkedList<T> {
    * @returns The value of the removed node (nodeB.value)
    */
   #removeUsingNodePair(nodePair) {
-    if (!nodePair.nodeB) return;
     // Keep reference for the "next" node
     const nodeC = nodePair.nodeB?.next;
     // A.next -> C
@@ -216,7 +208,7 @@ export default class LinkedList<T> {
    * @returns The value removed or undefined
    */
   remove(value: T): T | undefined {
-    if (!this.#head || !this.#tail) return;
+    if (!this.#head || !this.#tail || this.#length === 0) return;
     if (this.#head.value === value) return this.shift();
     if (this.#tail.value === value) return this.pop();
 
