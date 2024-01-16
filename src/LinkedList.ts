@@ -1,3 +1,20 @@
+// LinkedList.ts
+/**
+ * This is a generic implementation of the `Linked List` data structure.
+ *
+ * @author Wayne Fuchs
+ * @version 2024.01JAN.16
+ * @module LinkedList
+ */
+
+/**
+ * Using a Key/Value pair forces option visibility at time of list creation
+ * @param doublyLinked boolean to define whether a linked list is doubly linked or not
+ */
+type LinkedListOptions = {
+  doublyLinked?: boolean;
+};
+
 /**
  * @internal This type is only useful in the LinkedList class
  * @param value the value of the node
@@ -8,14 +25,6 @@ type LinkedListNode<T> = {
   value: T;
   next?: LinkedListNode<T>;
   prev?: LinkedListNode<T>;
-};
-
-/**
- * Using a Key/Value pair forces option visibility at time of list creation
- * @param doublyLinked boolean to define whether a linked list is doubly linked or not
- */
-type LinkedListOptions = {
-  doublyLinked?: boolean;
 };
 
 /**
